@@ -1,5 +1,7 @@
 "use client"
 
+import type { ReactNode } from "react"
+import { useRef } from "react"
 import { format } from "date-fns"
 import type { Project } from "@/lib/data/projects"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -8,10 +10,11 @@ import { Folder, CalendarBlank, Flag, User } from "@phosphor-icons/react/dist/ss
 import { cn } from "@/lib/utils"
 import { PriorityBadge } from "@/components/priority-badge"
 import { ProjectProgress } from "@/components/project-progress"
+import { useRouter } from "next/navigation"
 
 type ProjectCardProps = {
   project: Project
-  actions?: React.ReactNode
+  actions?: ReactNode
   variant?: "list" | "board"
 }
 
@@ -32,17 +35,15 @@ function statusConfig(status: Project["status"]) {
   }
 }
 
-function priorityLabel(priority: Project["priority"]) {
-  if (priority === "urgent") return "Urgent"
-  return priority.charAt(0).toUpperCase() + priority.slice(1)
-}
-
 export function ProjectCard({ project, actions, variant = "list" }: ProjectCardProps) {
   const s = statusConfig(project.status)
   const assignee = project.members?.[0]
   const dueDate = project.endDate
   const avatarUrl = getAvatarUrl(assignee)
   const isBoard = variant === "board"
+  const router = useRouter()
+  const draggingRef = useRef(false)
+  const startPosRef = useRef<{ x: number; y: number } | null>(null)
 
   const initials = assignee ? assignee.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase() : null
 
@@ -65,8 +66,51 @@ export function ProjectCard({ project, actions, variant = "list" }: ProjectCardP
     return format(dueDate, "MMM d")
   })()
 
+  const goToDetails = () => router.push(`/projects/${project.id}`)
+
+  const onKeyNavigate: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault()
+      goToDetails()
+    }
+  }
+
+  const onMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    if (!isBoard) return
+    startPosRef.current = { x: e.clientX, y: e.clientY }
+    draggingRef.current = false
+  }
+
+  const onMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    if (!isBoard || !startPosRef.current) return
+    const dx = Math.abs(e.clientX - startPosRef.current.x)
+    const dy = Math.abs(e.clientY - startPosRef.current.y)
+    if (dx > 5 || dy > 5) draggingRef.current = true
+  }
+
+  const onMouseUp: React.MouseEventHandler<HTMLDivElement> = () => {
+    if (!isBoard) return
+    startPosRef.current = null
+  }
+
   return (
-    <div className="rounded-2xl border border-border bg-background hover:shadow-lg/5 transition-shadow cursor-pointer">
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Open project ${project.name}`}
+      onClick={() => {
+        if (isBoard && draggingRef.current) {
+          draggingRef.current = false
+          return
+        }
+        goToDetails()
+      }}
+      onKeyDown={onKeyNavigate}
+      onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      className="rounded-2xl border border-border bg-background hover:shadow-lg/5 transition-shadow cursor-pointer focus:outline-none "
+    >
       <div className="p-4">
         <div className="flex items-center justify-between">
           {isBoard ? (
@@ -89,7 +133,15 @@ export function ProjectCard({ project, actions, variant = "list" }: ProjectCardP
             {isBoard && (
               <PriorityBadge level={project.priority} appearance="inline" />
             )}
-            {actions ? <div className="shrink-0">{actions}</div> : null}
+            {actions ? (
+              <div
+                className="shrink-0"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
+                {actions}
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -97,30 +149,13 @@ export function ProjectCard({ project, actions, variant = "list" }: ProjectCardP
           <p className="text-[15px] font-semibold text-foreground leading-6">
             {project.name}
           </p>
-          {isBoard ? (
-            <div className="mt-1 text-sm text-muted-foreground truncate">
-              {secondaryLine}
-            </div>
-          ) : (
-            (() => {
-              const a = project.client
-              const b = project.typeLabel
-              const c = project.durationLabel
-              if (a || b || c) {
-                return (
-                  <p className="mt-1 text-sm text-muted-foreground truncate">
-                    {[a, b, c].filter(Boolean).join(" • ")}
-                  </p>
-                )
-              }
-              if (project.tags && project.tags.length > 0) {
-                return (
-                  <p className="mt-1 text-sm text-muted-foreground truncate">{project.tags.join(" • ")}</p>
-                )
-              }
-              return null
-            })()
-          )}
+          {isBoard
+            ? secondaryLine && (
+                <div className="mt-1 text-sm text-muted-foreground truncate">{secondaryLine}</div>
+              )
+            : secondaryLine && (
+                <p className="mt-1 text-sm text-muted-foreground truncate">{secondaryLine}</p>
+              )}
         </div>
 
 
