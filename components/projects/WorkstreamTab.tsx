@@ -10,6 +10,7 @@ import {
   DragOverlay,
   PointerSensor,
   closestCorners,
+  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
@@ -90,7 +91,8 @@ export function WorkstreamTab({ workstreams }: WorkstreamTabProps) {
 
   const handleDragOver = (event: DragOverEvent) => {
     const overId = event.over?.id
-    if (typeof overId === "string") {
+    if (typeof overId === "string" && !overId.startsWith("group:")) {
+      // only track task ids for per-row drop indicator
       setOverTaskId(overId)
     } else {
       setOverTaskId(null)
@@ -127,6 +129,15 @@ export function WorkstreamTab({ workstreams }: WorkstreamTabProps) {
           targetTaskIndex = oIndex
         }
       })
+
+      // If we didn't land on a task but on a group container, allow dropping into empty lists
+      if (targetGroupIndex === -1 && overId.startsWith("group:")) {
+        const groupId = overId.slice("group:".length)
+        targetGroupIndex = prev.findIndex((group) => group.id === groupId)
+        if (targetGroupIndex !== -1) {
+          targetTaskIndex = prev[targetGroupIndex].tasks.length
+        }
+      }
 
       if (sourceGroupIndex === -1 || targetGroupIndex === -1) return prev
 
@@ -251,24 +262,12 @@ export function WorkstreamTab({ workstreams }: WorkstreamTabProps) {
                   </div>
                 </AccordionTrigger>
 
-                <AccordionContent className="border-t border-border bg-background/60 px-1.5">
-                  <SortableContext
-                    items={group.tasks.map((task) => task.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-1 py-2">
-                      {group.tasks.map((task) => (
-                        <TaskRow
-                          key={task.id}
-                          task={task}
-                          onToggle={() => toggleTask(group.id, task.id)}
-                          activeTaskId={activeTaskId}
-                          overTaskId={overTaskId}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </AccordionContent>
+                <WorkstreamTasks
+                  group={group}
+                  activeTaskId={activeTaskId}
+                  overTaskId={overTaskId}
+                  onToggleTask={(taskId) => toggleTask(group.id, taskId)}
+                />
               </AccordionItem>
             ))}
           </Accordion>
@@ -311,6 +310,35 @@ function getWorkstreamProgressColor(percent: number): string {
   if (percent >= 50) return "var(--chart-4)"
   if (percent > 0) return "var(--chart-5)"
   return "var(--chart-2)"
+}
+
+type WorkstreamTasksProps = {
+  group: WorkstreamGroup
+  activeTaskId: string | null
+  overTaskId: string | null
+  onToggleTask: (taskId: string) => void
+}
+
+function WorkstreamTasks({ group, activeTaskId, overTaskId, onToggleTask }: WorkstreamTasksProps) {
+  const { setNodeRef } = useDroppable({ id: `group:${group.id}` })
+
+  return (
+    <AccordionContent className="border-t border-border bg-background/60 px-1.5">
+      <SortableContext items={group.tasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
+        <div ref={setNodeRef} className="space-y-1 py-2">
+          {group.tasks.map((task) => (
+            <TaskRow
+              key={task.id}
+              task={task}
+              onToggle={() => onToggleTask(task.id)}
+              activeTaskId={activeTaskId}
+              overTaskId={overTaskId}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </AccordionContent>
+  )
 }
 
 type TaskRowProps = {
