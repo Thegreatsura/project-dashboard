@@ -88,6 +88,14 @@ export function TaskBoardCard({ task, variant = "default", onToggle, onOpen, onC
         <Checkbox
           checked={isDone}
           onCheckedChange={onToggle}
+          onClick={(e) => {
+            // Don't let checkbox clicks bubble and trigger card onOpen
+            e.stopPropagation()
+          }}
+          onKeyDown={(e) => {
+            // Prevent Enter/Space on checkbox from triggering card keyboard handler
+            e.stopPropagation()
+          }}
           className="rounded-full border-border bg-background data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 hover:cursor-pointer mt-0.5"
           aria-label={`Mark ${task.name} as ${isDone ? "todo" : "done"}`}
         />
