@@ -31,6 +31,11 @@ import {
 } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 
+const WAVEFORM_BAR_HEIGHTS = Array.from({ length: 60 }, (_, i) => {
+    const base = [25, 60, 40, 80, 55, 70, 35, 90]
+    return base[i % base.length]
+})
+
 type NotePreviewModalProps = {
     open: boolean
     onOpenChange: (open: boolean) => void
@@ -179,12 +184,12 @@ export function NotePreviewModal({
                                 </div>
 
                                 <div className="h-12 flex items-center justify-center gap-[2px]">
-                                    {Array.from({ length: 60 }).map((_, i) => (
+                                    {WAVEFORM_BAR_HEIGHTS.map((height, i) => (
                                         <div
                                             key={i}
                                             className="w-1 bg-muted-foreground/20 rounded-full"
                                             style={{
-                                                height: `${Math.random() * 100}%`,
+                                                height: `${height}%`,
                                                 minHeight: "4px",
                                             }}
                                         />
