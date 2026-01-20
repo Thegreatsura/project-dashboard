@@ -14,9 +14,9 @@ type FileTypeIconProps = {
 export function FileTypeIcon({
     type,
     wrapperSize = 44,
-    iconSize = 28,
+    iconSize = 40,
     className = "",
-    background = true,
+    background = false,
 }: FileTypeIconProps) {
     const { src, alt } = getFileIcon(type)
 

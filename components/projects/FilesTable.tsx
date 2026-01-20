@@ -96,8 +96,8 @@ export function FilesTable({ files, onAddFile }: FilesTableProps) {
                                         />
                                     </TableCell>
                                     <TableCell className="font-medium">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/40">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-lg">
                                                 <Image
                                                     src={icon.src}
                                                     alt={icon.alt}

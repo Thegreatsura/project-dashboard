@@ -16,8 +16,8 @@ export function RecentFileCard({ file, onEdit, onDelete }: RecentFileCardProps) 
 
     return (
         <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
-            <div className="flex items-start gap-3 min-w-0">
-                <FileTypeIcon type={file.type} wrapperSize={44} iconSize={28} />
+            <div className="flex items-start gap-2 min-w-0">
+                <FileTypeIcon type={file.type} wrapperSize={44} iconSize={40} background={false} />
                 <div className="min-w-0">
                     <div className="truncate text-sm font-medium text-foreground">{file.name}</div>
                     <div className="text-sm text-muted-foreground">{sizeLabel}</div>
