@@ -43,7 +43,7 @@ export function TaskRowBase({
         <div className="flex items-center gap-2">
           <span
             className={cn(
-              "flex-1 truncate text-left",
+              "flex-1 truncate text-left max-w-[60vw] sm:max-w-none",
               checked && "line-through text-muted-foreground",
             )}
           >
@@ -62,7 +62,7 @@ export function TaskRowBase({
           </div>
         )}
       </div>
-      <div className="flex items-center gap-3 text-xs">
+      <div className="flex items-center gap-3 text-xs shrink-0 ml-2">
         {meta}
       </div>
     </div>

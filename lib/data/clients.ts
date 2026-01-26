@@ -1,6 +1,6 @@
 import { projects } from "@/lib/data/projects"
 
-export type ClientStatus = "prospect" | "active" | "on_hold" | "archived"
+export type ClientStatus = "prospect" | "active" | "on_hold" | "completed" | "archived"
 
 export type Client = {
   id: string
@@ -28,7 +28,7 @@ export const clients: Client[] = [
     owner: "Jason Duong",
     primaryContactName: "Sarah Lee",
     primaryContactEmail: "sarah.lee@acme.example",
-    notes: "Key strategic client with multiple ongoing projects.",
+    notes: "Key strategic client with multiple ongoing projects spanning growth, retention, and internal tooling workstreams. Notes should demonstrate how longer paragraphs wrap and flow inside the drawer without breaking layout.",
     segment: "Enterprise",
     lastActivityLabel: "3 days ago",
   },

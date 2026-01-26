@@ -67,16 +67,16 @@ export function WorkstreamTab({ workstreams }: WorkstreamTabProps) {
       prev.map((group) =>
         group.id === groupId
           ? {
-              ...group,
-              tasks: group.tasks.map((task) =>
-                task.id === taskId
-                  ? {
-                      ...task,
-                      status: task.status === "done" ? "todo" : "done",
-                    }
-                  : task,
-              ),
-            }
+            ...group,
+            tasks: group.tasks.map((task) =>
+              task.id === taskId
+                ? {
+                  ...task,
+                  status: task.status === "done" ? "todo" : "done",
+                }
+                : task,
+            ),
+          }
           : group,
       ),
     )
@@ -188,10 +188,10 @@ export function WorkstreamTab({ workstreams }: WorkstreamTabProps) {
   return (
     <section className="rounded-2xl border border-border bg-muted shadow-[var(--shadow-workstream)] p-3 space-y-3">
       <div className="flex items-center justify-between gap-3 px-2">
-        <h2 className="text-sm font-semibold tracking-normal text-foreground uppercase">
+        <h2 className="flex-1 min-w-0 truncate text-sm font-semibold tracking-normal text-foreground uppercase">
           WORKSTEAM BREAKDOWN
         </h2>
-        <div className="flex items-center gap-1 opacity-60">
+        <div className="flex items-center gap-1 opacity-60 shrink-0">
           <Button
             variant="ghost"
             size="icon-sm"
@@ -238,12 +238,14 @@ export function WorkstreamTab({ workstreams }: WorkstreamTabProps) {
                 className="mb-2 overflow-hidden rounded-xl border border-border bg-background last:mb-0"
               >
                 <AccordionTrigger className="bg-background">
-                  <div className="flex flex-1 items-center gap-3">
-                    <CaretDown className="h-4 w-4 text-muted-foreground hover:cursor-pointer" aria-hidden="true" />
-                    <span className="flex-1 truncate text-left text-sm font-medium text-foreground hover:cursor-pointer">
-                      {group.name}
-                    </span>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <CaretDown className="h-4 w-4 text-muted-foreground hover:cursor-pointer" aria-hidden="true" />
+                      <span className="flex-1 truncate text-left text-sm font-medium text-foreground hover:cursor-pointer">
+                        {group.name}
+                      </span>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground shrink-0">
                       <Button asChild size="icon-sm" variant="ghost" className="size-6 rounded-md">
                         <span
                           role="button"

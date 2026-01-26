@@ -3,21 +3,15 @@
 import { useEffect, useState } from "react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getClientById, getProjectCountForClient, clients, type Client, type ClientStatus } from "@/lib/data/clients"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ClientStatusBadge } from "@/components/clients/ClientStatusBadge"
+import { getClientById, getProjectCountForClient, clients, type Client } from "@/lib/data/clients"
 import { projects } from "@/lib/data/projects"
 import { ClientWizard } from "@/components/clients/ClientWizard"
 import Link from "next/link"
-
-function statusLabel(status: ClientStatus): string {
-  if (status === "prospect") return "Prospect"
-  if (status === "active") return "Active"
-  if (status === "on_hold") return "On hold"
-  return "Archived"
-}
 
 type ClientDetailsPageProps = {
   clientId: string
@@ -45,22 +39,36 @@ export function ClientDetailsPage({ clientId }: ClientDetailsPageProps) {
   const client = state.client
   const relatedProjects = projects.filter((p) => p.client === client.name)
   const projectCount = getProjectCountForClient(client.name)
+  const displayName = client.primaryContactName ?? client.name
+  const email = client.primaryContactEmail
+  const initials = displayName
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()
 
   return (
     <div className="flex flex-1 flex-col min-w-0 m-2 border border-border rounded-lg">
       <div className="flex items-center justify-between gap-4 px-4 py-4">
         <div className="flex items-center gap-3">
           <SidebarTrigger className="h-8 w-8 rounded-lg hover:bg-accent text-muted-foreground" />
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-base font-medium text-foreground">{client.name}</p>
-              <Badge variant="outline" className="rounded-full px-2 py-0.5 text-[11px] font-medium capitalize">
-                {statusLabel(client.status)}
-              </Badge>
+          <div className="flex items-center gap-3 min-w-0">
+            <Avatar className="h-11 w-11">
+              <AvatarFallback className="text-sm font-semibold">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-base font-medium text-foreground truncate">{displayName}</p>
+                <ClientStatusBadge status={client.status} />
+              </div>
+              {email && (
+                <p className="text-xs text-muted-foreground truncate">{email}</p>
+              )}
+              <p className="text-xs text-muted-foreground truncate">
+                {client.name} · {projectCount} project{projectCount === 1 ? "" : "s"}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Client · {projectCount} projects
-            </p>
           </div>
         </div>
 
