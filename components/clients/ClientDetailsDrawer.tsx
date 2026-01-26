@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   X,
@@ -43,6 +43,7 @@ export function ClientDetailsDrawer({ clientId, onClose }: ClientDetailsDrawerPr
   const [notesOpen, setNotesOpen] = useState(true)
   const [sharedOpen, setSharedOpen] = useState(true)
   const [projectOffset, setProjectOffset] = useState(0)
+  const projectsRowRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setProjectOffset(0)
@@ -55,6 +56,10 @@ export function ClientDetailsDrawer({ clientId, onClose }: ClientDetailsDrawerPr
 
   const relatedProjects = projects.filter((p) => p.client === client.name)
   const projectCount = getProjectCountForClient(client.name)
+  const projectsPerPage = 3
+  const totalPages = Math.max(1, Math.ceil(relatedProjects.length / projectsPerPage))
+  const canPrev = projectOffset > 0
+  const canNext = projectOffset < totalPages - 1
 
   const displayName = client.primaryContactName ?? client.name
   const email = client.primaryContactEmail
@@ -190,20 +195,26 @@ export function ClientDetailsDrawer({ clientId, onClose }: ClientDetailsDrawerPr
                 <button
                   type="button"
                   className="absolute left-0 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground hover:shadow disabled:opacity-40 disabled:pointer-events-none disabled:bg-background cursor-pointer"
-                  disabled={projectOffset === 0}
-                  onClick={() => setProjectOffset((prev) => Math.max(0, prev - 1))}
+                  disabled={!canPrev}
+                  onClick={() => {
+                    if (!projectsRowRef.current || !canPrev) return
+                    const container = projectsRowRef.current
+                    const pageWidth = container.clientWidth
+                    container.scrollBy({ left: -pageWidth, behavior: "smooth" })
+                    setProjectOffset((prev) => Math.max(0, prev - 1))
+                  }}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  {(relatedProjects.length <= 3
-                    ? relatedProjects
-                    : relatedProjects.slice(projectOffset, projectOffset + 3)
-                  ).map((p) => (
+                <div
+                  ref={projectsRowRef}
+                  className="flex gap-3 overflow-x-auto scroll-smooth pb-1 no-scrollbar"
+                >
+                  {relatedProjects.map((p) => (
                     <Link
                       key={p.id}
                       href={`/projects/${p.id}`}
-                      className="flex flex-col justify-between rounded-[24px] border border-border bg-muted px-4 py-4 shadow-[var(--shadow-workstream)] hover:bg-muted/80"
+                      className="flex min-w-[220px] flex-col justify-between rounded-[24px] border border-border bg-muted px-4 py-4 shadow-[var(--shadow-workstream)] hover:bg-muted/80 sm:min-w-[240px]"
                     >
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background">
                         <Folder className="h-4 w-4 text-muted-foreground" />
@@ -220,12 +231,14 @@ export function ClientDetailsDrawer({ clientId, onClose }: ClientDetailsDrawerPr
                 <button
                   type="button"
                   className="absolute right-0 top-1/2 flex h-8 w-8 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground hover:shadow disabled:opacity-40 disabled:pointer-events-none disabled:bg-background cursor-pointer"
-                  disabled={projectOffset + 3 >= relatedProjects.length}
-                  onClick={() =>
-                    setProjectOffset((prev) =>
-                      prev + 3 >= relatedProjects.length ? prev : prev + 1,
-                    )
-                  }
+                  disabled={!canNext}
+                  onClick={() => {
+                    if (!projectsRowRef.current || !canNext) return
+                    const container = projectsRowRef.current
+                    const pageWidth = container.clientWidth
+                    container.scrollBy({ left: pageWidth, behavior: "smooth" })
+                    setProjectOffset((prev) => (prev < totalPages - 1 ? prev + 1 : prev))
+                  }}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>

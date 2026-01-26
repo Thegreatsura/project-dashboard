@@ -578,7 +578,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    id: "10",
+    id: "12",
     name: "Billing Dashboard Polish",
     taskCount: 2,
     progress: 100,
