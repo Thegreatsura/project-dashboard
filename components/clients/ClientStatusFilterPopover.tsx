@@ -29,7 +29,7 @@ export function ClientStatusFilterPopover({ initialStatus }: ClientStatusFilterP
             <PopoverTrigger asChild>
                 <button
                     type="button"
-                    className="flex items-center gap-8 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground cursor-pointer transition-colors hover:bg-muted"
+                    className="flex w-full items-center justify-between gap-4 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground cursor-pointer transition-colors hover:bg-muted sm:w-auto sm:justify-start sm:gap-8"
                 >
                     <span className="text-xs text-muted-foreground">Stage</span>
                     <span className="inline-flex items-center gap-2 rounded-full p-0 text-xs font-medium text-foreground">
@@ -39,9 +39,6 @@ export function ClientStatusFilterPopover({ initialStatus }: ClientStatusFilterP
                 </button>
             </PopoverTrigger>
             <PopoverContent align="end" sideOffset={8} className="w-64 rounded-xl p-2">
-                <div className="mb-2 px-1">
-                    <p className="text-xs font-medium text-muted-foreground">Client status</p>
-                </div>
                 <div className="space-y-1.5">
                     {STATUS_ITEMS.map((item) => {
                         const isActive = item.value === status

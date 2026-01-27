@@ -133,35 +133,46 @@ export function ClientDetailsDrawer({ clientId, onClose }: ClientDetailsDrawerPr
       <aside
         className="flex h-full w-full max-w-2xl flex-col border-l border-border bg-background shadow-2xl"
       >
-        <div className="flex items-start justify-between px-5 pt-4 pb-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <Avatar className="h-11 w-11">
-              <AvatarFallback className="text-sm font-semibold">{initials}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col gap-0.5 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
-              {email && (
-                <p className="text-xs text-muted-foreground truncate">{email}</p>
-              )}
+        <div className="px-5 pt-4 pb-3 space-y-2">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-2 min-w-0 flex-1">
+              <div className="flex items-center gap-3 min-w-0">
+                <Avatar className="h-11 w-11">
+                  <AvatarFallback className="text-sm font-semibold">{initials}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+                  {email && (
+                    <p className="text-xs text-muted-foreground truncate">{email}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:block">
+                <ClientStatusFilterPopover initialStatus={client.status} />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground"
+                onClick={onClose}
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Mobile-only Stage row, full width of the header container */}
+          <div className="w-full sm:hidden">
             <ClientStatusFilterPopover initialStatus={client.status} />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground"
-              onClick={onClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-8">
+        <div className="flex-1 overflow-y-auto px-5 pb-4 pt-0 sm:pt-4 space-y-8">
           <div className="rounded-2xl border border-border bg-card/80 px-5 py-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {companyInfoTiles.map((item) => {
                 const Icon = item.icon
                 return (
