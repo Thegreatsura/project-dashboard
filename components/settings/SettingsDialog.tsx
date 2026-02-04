@@ -219,6 +219,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         {activeItemId === "types" && <TypesSettingsPane />}
                         {activeItemId === "billing" && <BillingSettingsPane />}
                         {activeItemId === "import" && <ImportSettingsPane />}
+                        {activeItemId === "agents" && <AgentsSettingsPane />}
+                        {activeItemId === "skills" && <SkillsSettingsPane />}
                         {activeItemId !== "account" &&
                             activeItemId !== "notifications" &&
                             activeItemId !== "preferences" &&
@@ -226,7 +228,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                             activeItemId !== "identity" &&
                             activeItemId !== "types" &&
                             activeItemId !== "billing" &&
-                            activeItemId !== "import" && (
+                            activeItemId !== "import" &&
+                            activeItemId !== "agents" &&
+                            activeItemId !== "skills" && (
                                 <PlaceholderSettingsPane />
                             )}
                     </main>
@@ -1575,6 +1579,398 @@ function NotificationsSettingsPane() {
                                 {card.description}
                             </p>
                         </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function AgentsSettingsPane() {
+    const capabilityHighlights = [
+        {
+            id: "planning",
+            label: "Plan work and break it into tasks with clear owners.",
+            icon: CheckCircle,
+        },
+        {
+            id: "review",
+            label: "Review specs and docs for gaps before execution.",
+            icon: ShieldCheck,
+        },
+        {
+            id: "updates",
+            label: "Draft status updates and summaries for the team.",
+            icon: PencilSimpleLine,
+        },
+        {
+            id: "automation",
+            label: "Run checks and workflows with approval guardrails.",
+            icon: Sparkle,
+        },
+    ] as const
+
+    const moreAgents = [
+        {
+            id: "create",
+            title: "Create a custom agent",
+            description: "Design a specialist with your tools, rules, and API connections.",
+            icon: Plus,
+            variant: "create",
+        },
+        {
+            id: "spec-writer",
+            title: "Product spec writer",
+            description: "Turns ideas into structured specs, milestones, and acceptance criteria.",
+            icon: PencilSimpleLine,
+            variant: "default",
+        },
+        {
+            id: "qa-tester",
+            title: "QA tester",
+            description: "Finds regressions, drafts test plans, and highlights risks.",
+            icon: CheckCircle,
+            variant: "default",
+        },
+        {
+            id: "ui-reviewer",
+            title: "UI reviewer",
+            description: "Audits UI for consistency, accessibility, and polish.",
+            icon: Sparkle,
+            variant: "default",
+        },
+        {
+            id: "release",
+            title: "Release manager",
+            description: "Builds release notes, launch checklists, and stakeholder updates.",
+            icon: ShieldCheck,
+            variant: "default",
+        },
+        {
+            id: "support",
+            title: "Customer support drafts",
+            description: "Writes empathetic replies with product-aware context.",
+            icon: UsersThree,
+            variant: "default",
+        },
+    ] as const
+
+    const quickActions = [
+        { id: "manage", label: "Manage agents", icon: SlidersHorizontal, variant: "outline" as const },
+        { id: "invite", label: "Invite teammate", icon: UsersThree, variant: "outline" as const },
+        { id: "connect", label: "Connect tools", icon: UploadSimple, variant: "default" as const },
+    ] as const
+
+    return (
+        <div className="space-y-8">
+            <div>
+                <DialogTitle className="text-xl">Agents</DialogTitle>
+                <DialogDescription className="mt-1">
+                    Create specialized AI teammates to plan, write, review, and ship work alongside you. Each agent
+                    has its own tools, rules, and permissions.
+                </DialogDescription>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="text-sm font-semibold text-foreground">Your team</h3>
+                    <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                        Manage agents
+                    </Button>
+                </div>
+                <div className="rounded-2xl border border-border bg-card/70 p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                <Robot className="h-5 w-5" />
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-sm font-semibold text-foreground">Dart AI</span>
+                                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                                        Active
+                                    </span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    Plan, manage, and build any task or project with the full context of your workspace.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                                View activity
+                            </Button>
+                            <Button size="sm" className="h-8 px-3 text-xs">
+                                Open agent
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        {capabilityHighlights.map((capability) => {
+                            const Icon = capability.icon
+                            return (
+                                <div
+                                    key={capability.id}
+                                    className="flex items-start gap-3 rounded-xl border border-border/70 bg-muted/20 px-3 py-2.5 text-xs text-muted-foreground"
+                                >
+                                    <span className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                        <Icon className="h-3.5 w-3.5" />
+                                    </span>
+                                    <span>{capability.label}</span>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">More agents</h3>
+                    <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-muted-foreground">
+                        Browse all templates
+                    </Button>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {moreAgents.map((agent) => {
+                        const Icon = agent.icon
+                        const isCreate = agent.variant === "create"
+                        return (
+                            <button
+                                key={agent.id}
+                                type="button"
+                                className={cn(
+                                    "flex h-full cursor-pointer flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition",
+                                    isCreate
+                                        ? "border-dashed border-primary/50 bg-primary/5 text-foreground hover:border-primary/70"
+                                        : "border-border bg-card/70 text-foreground hover:border-primary/40 hover:bg-primary/5",
+                                )}
+                            >
+                                <span
+                                    className={cn(
+                                        "flex h-9 w-9 items-center justify-center rounded-xl",
+                                        isCreate ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
+                                    )}
+                                >
+                                    <Icon className="h-4 w-4" />
+                                </span>
+                                <div className="space-y-1">
+                                    <p className="text-sm font-semibold">{agent.title}</p>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">{agent.description}</p>
+                                </div>
+                            </button>
+                        )
+                    })}
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-foreground">Quick actions</h3>
+                <div className="flex flex-wrap gap-3">
+                    {quickActions.map((action) => {
+                        const Icon = action.icon
+                        return (
+                            <Button key={action.id} variant={action.variant} size="sm" className="gap-2">
+                                <Icon className="h-4 w-4" />
+                                {action.label}
+                            </Button>
+                        )
+                    })}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function SkillsSettingsPane() {
+    const installedSkills = [
+        {
+            id: "figma",
+            name: "Figma to code",
+            description: "Translate design frames into UI-ready components.",
+            category: "Design",
+            lastUsed: "2 days ago",
+            enabled: true,
+            icon: Sparkle,
+        },
+        {
+            id: "ci",
+            name: "CI failure triage",
+            description: "Summarize failed checks and propose next fixes.",
+            category: "DevOps",
+            lastUsed: "Yesterday",
+            enabled: true,
+            icon: ShieldCheck,
+        },
+        {
+            id: "meeting",
+            name: "Meeting to action items",
+            description: "Extract decisions and next steps from transcripts.",
+            category: "Docs",
+            lastUsed: "4 days ago",
+            enabled: false,
+            icon: PencilSimpleLine,
+        },
+    ] as const
+
+    const skillLibrary = [
+        {
+            id: "release-notes",
+            title: "Release notes generator",
+            description: "Turns merged work into polished release notes.",
+            icon: Star,
+        },
+        {
+            id: "support",
+            title: "Support reply drafts",
+            description: "Creates empathetic responses with product context.",
+            icon: UsersThree,
+        },
+        {
+            id: "research",
+            title: "User research summaries",
+            description: "Condenses interviews into insights and themes.",
+            icon: Sparkle,
+        },
+        {
+            id: "roadmap",
+            title: "Roadmap planner",
+            description: "Builds milestones and timelines from strategy notes.",
+            icon: SlidersHorizontal,
+        },
+    ] as const
+
+    const insights = [
+        { id: "top-skill", label: "Top skill", value: "Figma to code" },
+        { id: "weekly-runs", label: "Runs this week", value: "28" },
+        { id: "time-saved", label: "Estimated time saved", value: "6.4 hrs" },
+    ] as const
+
+    return (
+        <div className="space-y-8">
+            <div>
+                <DialogTitle className="text-xl">Skills</DialogTitle>
+                <DialogDescription className="mt-1">
+                    Skills are reusable workflows and toolchains. Add them to agents or use them directly to speed up
+                    repeat tasks.
+                </DialogDescription>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="text-sm font-semibold text-foreground">Installed skills</h3>
+                    <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                        Manage library
+                    </Button>
+                </div>
+                <div className="space-y-3">
+                    {installedSkills.map((skill) => {
+                        const Icon = skill.icon
+                        return (
+                            <div
+                                key={skill.id}
+                                className="flex flex-col gap-4 rounded-2xl border border-border bg-card/70 p-4 sm:flex-row sm:items-center sm:justify-between"
+                            >
+                                <div className="space-y-3">
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                                            <Icon className="h-4 w-4" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-semibold text-foreground">{skill.name}</p>
+                                            <p className="text-xs text-muted-foreground">{skill.description}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+                                        <span className="rounded-full border border-border/70 px-2 py-0.5">
+                                            {skill.category}
+                                        </span>
+                                        <span className="rounded-full border border-border/70 px-2 py-0.5">
+                                            Last used {skill.lastUsed}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span
+                                        className={cn(
+                                            "text-xs font-semibold",
+                                            skill.enabled ? "text-emerald-400" : "text-muted-foreground",
+                                        )}
+                                    >
+                                        {skill.enabled ? "Active" : "Paused"}
+                                    </span>
+                                    <Switch defaultChecked={skill.enabled} />
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">Skill library</h3>
+                    <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-muted-foreground">
+                        Browse all
+                    </Button>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                    {skillLibrary.map((skill) => {
+                        const Icon = skill.icon
+                        return (
+                            <button
+                                key={skill.id}
+                                type="button"
+                                className="flex cursor-pointer flex-col gap-3 rounded-2xl border border-border bg-card/70 px-4 py-4 text-left transition hover:border-primary/40 hover:bg-primary/5"
+                            >
+                                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                                    <Icon className="h-4 w-4" />
+                                </span>
+                                <div className="space-y-1">
+                                    <p className="text-sm font-semibold">{skill.title}</p>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">{skill.description}</p>
+                                </div>
+                            </button>
+                        )
+                    })}
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-foreground">Add a skill</h3>
+                <div className="flex flex-wrap gap-3">
+                    <Button variant="outline" size="sm" className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        Install from library
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-2">
+                        <UploadSimple className="h-4 w-4" />
+                        Import from repo
+                    </Button>
+                    <Button size="sm" className="gap-2">
+                        <Sparkle className="h-4 w-4" />
+                        Create new skill
+                    </Button>
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-foreground">Usage insights</h3>
+                <div className="grid gap-3 md:grid-cols-3">
+                    {insights.map((insight) => (
+                        <div
+                            key={insight.id}
+                            className="rounded-2xl border border-border bg-muted/30 px-4 py-3"
+                        >
+                            <div className="text-xs text-muted-foreground">{insight.label}</div>
+                            <div className="mt-1 text-sm font-semibold text-foreground">{insight.value}</div>
+                        </div>
                     ))}
                 </div>
             </div>
